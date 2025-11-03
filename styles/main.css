@@ -1,0 +1,417 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Base */
+body, html {
+    width: 100%;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #0b0f1a;
+}
+
+.app-wrapper {
+    min-height: 100vh;
+    background: url('../images/background.jpg') no-repeat center center;
+    background-size: cover;
+    padding: 16px;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+}
+
+.logo {
+    height: 32px;
+    width: auto;
+}
+
+.vip-button-wrapper {
+    position: relative;
+}
+
+.vip-btn {
+    display: flex;
+    align-items: center;
+    background: #27ae60;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    gap: 6px;
+    position: relative;
+}
+
+.vip-btn img {
+    width: 18px;
+    height: 18px;
+}
+
+.vip-indicator {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    display: none;
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Main */
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-top: 60px;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+/* Заголовки */
+/* Заголовки */
+.main-heading {
+    text-align: center;
+    color: #fff;
+    margin-top: -20px; /* Подняли заголовок выше */
+    margin-bottom: -10px;
+}
+
+.main-heading h1 {
+    font-size: 27px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.main-heading p {
+    font-size: 15px;
+    color: #ccc;
+    opacity: 0.6;
+}
+
+
+/* Glass Card */
+.glass-card {
+    width: 100%;
+    max-width: 420px;
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+.field-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.field-block label {
+    font-size: 14px;
+    color: #ccc;
+}
+
+.field-block input {
+    padding: 10px 12px;
+    font-size: 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+}
+
+/* Кнопка */
+.submit-btn {
+    margin-top: 10px;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: not-allowed;
+    background: #2c3e50;
+    color: #888;
+    transition: all 0.3s;
+}
+
+.submit-btn.active {
+    background: #1abc9c;
+    color: white;
+    cursor: pointer;
+}
+
+/* Glass Signal */
+.glass-signal {
+    width: 100%;
+    max-width: 420px;
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.signal-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.signal-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.signal-title img {
+    width: 16px;
+    height: 16px;
+}
+
+.signal-title span,
+.signal-model span {
+    font-size: 15px;
+    color: #ccc;
+}
+
+.signal-bottom {
+    font-size: 15px;
+    color: #ccc;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    text-align: left;
+}
+
+.signal-bottom {
+    font-size: 15px;
+    color: #ccc;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    text-align: center; /* Центрирует содержимое */
+}
+
+.signal-bottom svg.wave-loader {
+    width: 28px;
+    height: 28px;
+    stroke: white;
+}
+
+/* FAQ Section */
+.faq-section {
+    max-width: 420px;
+    margin: 40px auto 0;
+    color: white;
+}
+
+.faq-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    text-align: left;
+    color: white;
+}
+
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.faq-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-question {
+    width: 100%;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.arrow-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.faq-item.open .arrow-icon {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    opacity: 0;
+    padding: 0 16px;
+    font-size: 14px;
+    color: #ccc;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.faq-item.open .faq-answer {
+    max-height: 300px;
+    opacity: 1;
+    padding: 0 16px 14px;
+}
+
+/* ==== Language Dropdown ==== */
+.lang-dropdown {
+    position: relative;
+    margin-top: 8px;
+}
+
+.lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.lang-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.lang-flag {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.lang-caret {
+    width: 8px;
+    height: 6px;
+    opacity: 0.7;
+    transform-origin: 50% 50%;
+    transition: transform 0.2s ease;
+}
+
+.lang-dropdown.open .lang-caret {
+    transform: rotate(180deg);
+}
+
+.lang-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 200px;
+    max-height: 260px;
+    background: #fff;
+    color: #000;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    padding: 8px 0;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.lang-menu.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+}
+
+.lang-menu li {
+    list-style: none;
+}
+
+.lang-menu button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    gap: 10px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.lang-menu button:hover {
+    background: #f1f1f1;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.vip-button-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.lang-dropdown {
+    position: absolute;
+    top: 100%;
+    margin-top: 8px;
+    right: 0;
+}
+

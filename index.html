@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pocket Signals</title>
+    <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+<div class="app-wrapper">
+    <header class="header">
+        <img src="images/logo.svg" alt="Логотип" class="logo" />
+
+        <div class="vip-button-wrapper">
+            <button class="vip-btn" id="vipBtn">
+                <img src="images/vip-icon.svg" alt="VIP" />
+                <span>Стать VIP</span>
+                <span class="vip-indicator" id="vipIndicator"></span>
+            </button>
+
+            <!-- Языковое меню ПОД VIP -->
+            <div class="lang-dropdown" id="langDropdown">
+                <button class="lang-btn" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+                    <img class="lang-flag" id="langFlag" src="images/flags/ru.svg" alt="RU" />
+                    <span id="langCode">RU</span>
+                    <svg class="lang-caret" width="8" height="6" viewBox="0 0 8 6" aria-hidden="true">
+                        <path fill="#fff" d="M.234.334A.8.8 0 0 1 1.276.256l.09.078L4 2.968 6.634.334A.8.8 0 0 1 7.676.256l.09.078a.8.8 0 0 1 .077 1.042l-.077.09-3.2 3.2a.8.8 0 0 1-1.042.077l-.09-.078-3.2-3.2a.8.8 0 0 1 0-1.131Z" opacity=".5"/>
+                    </svg>
+                </button>
+                <ul class="lang-menu" id="langMenu" role="listbox" tabindex="-1" aria-label="Select language"></ul>
+            </div>
+        </div>
+    </header>
+
+
+
+    <main class="main">
+        <!-- Заголовок -->
+        <div class="main-heading">
+            <h1>Торгуй вместе с AI</h1>
+            <p>Умные сигналы для прибыльной торговли</p>
+        </div>
+
+        <!-- Блок параметров -->
+        <div class="glass-card">
+            <div class="field-block" onclick="selectField('pair')">
+                <label>Валютная пара</label>
+                <input type="text" id="pairField" placeholder="Выбери пару" readonly />
+            </div>
+
+            <div class="field-block" onclick="selectField('time')">
+                <label>Время экспирации</label>
+                <input type="text" id="timeField" placeholder="Выбери время" readonly />
+            </div>
+
+            <div class="field-block" onclick="selectField('model')">
+                <label>AI модель</label>
+                <input type="text" id="modelField" placeholder="Выбери модель" readonly />
+            </div>
+
+            <button class="submit-btn" id="getSignalBtn" disabled>Получить сигнал</button>
+        </div>
+
+        <!-- Блок сигнала -->
+        <div class="glass-signal">
+            <div class="signal-top">
+                <div class="signal-title">
+                    <img src="images/signal-icon.svg" alt="Сигнал" />
+                    <span>Сигнал</span>
+                </div>
+                <div class="signal-model">
+                    Модель: <span id="selectedModel">NeuralEdge V1</span>
+                </div>
+            </div>
+            <div class="signal-bottom">
+                <!-- 🔄 Анимированная иконка вместо текста -->
+                <svg class="wave-loader" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2">
+                        <animate attributeName="stroke-dasharray" values="120;20;120" dur="1.5s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" />
+                    </path>
+                </svg>
+            </div>
+        </div>
+    </main>
+
+    <section class="faq-section">
+        <h2 class="faq-title">FAQ</h2>
+        <div class="faq-list">
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Что такое AI сигнал?</span>
+                    <img src="images/ArrowDownAlt2.svg" class="arrow-icon" alt="Стрелка" />
+                </button>
+                <div class="faq-answer">
+                    AI сигнал — это торговый сигнал, сгенерированный искусственным интеллектом на основе анализа рынка.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Как выбрать правильную модель?</span>
+                    <img src="images/ArrowDownAlt2.svg" class="arrow-icon" alt="Стрелка" />
+                </button>
+                <div class="faq-answer">
+                    Выбирайте модель в зависимости от уровня доступа и предпочтений: стандартные или платиновые.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Что такое время экспирации?</span>
+                    <img src="images/ArrowDownAlt2.svg" class="arrow-icon" alt="Стрелка" />
+                </button>
+                <div class="faq-answer">
+                    Это момент, когда сделка автоматически закрывается. Выберите время, подходящее для вашей стратегии.
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+</div>
+
+
+
+
+<script src="scripts/main.js"></script>
+</body>
+</html>
