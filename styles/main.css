@@ -210,7 +210,7 @@ body, html {
     font-size: 15px;
     color: #ccc;
     padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
     width: 100%;
     text-align: left;
 }
@@ -219,7 +219,7 @@ body, html {
     font-size: 15px;
     color: #ccc;
     padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
     width: 100%;
     text-align: center; /* Центрирует содержимое */
 }
@@ -414,4 +414,199 @@ body, html {
     margin-top: 8px;
     right: 0;
 }
+
+/* ===== Currency Pair Popup (mobile) ===== */
+:root {
+    --cp-bg: #0e1621;
+    --cp-panel: #1c2532;
+    --cp-panel-2: #111a24;
+    --cp-text: #e3eefc;
+    --cp-muted: #8aa4c0;
+    --cp-accent: #3ba3ff;
+    --cp-border: #243244;
+    --cp-hover: #223044;
+    --cp-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+.cp-overlay{position:fixed;inset:0;background:rgba(4,10,16,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.cp-overlay[aria-hidden="false"]{display:flex}
+.cp{width:100%;max-width:420px;background:var(--cp-panel);border:1px solid var(--cp-border);border-radius:16px;box-shadow:var(--cp-shadow);overflow:hidden;position:relative;color:var(--cp-text)}
+.cp-header{padding:12px 12px 8px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 60%);border-bottom:1px solid var(--cp-border)}
+.cp-tabs{display:flex;gap:8px}
+.cp-tab{flex:1 1 auto;display:flex;align-items:center;justify-content:center;height:36px;border-radius:10px;background:var(--cp-panel-2);border:1px solid var(--cp-border);cursor:pointer;user-select:none}
+.cp-tab[aria-selected="true"]{outline:2px solid var(--cp-accent);background:#0f2032}
+.cp-tab img{width:18px;height:18px;display:block}
+.cp-search-row{display:flex;gap:8px;align-items:center;margin-top:10px}
+.cp-search{position:relative;flex:1 1 auto}
+.cp-search input{width:100%;height:38px;padding:0 34px 0 36px;background:var(--cp-panel-2);color:var(--cp-text);border:1px solid var(--cp-border);border-radius:12px;outline:none}
+.cp-search input::placeholder{color:var(--cp-muted)}
+.cp-icon-left{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.8}
+.cp-fav{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;background:var(--cp-panel-2);border:1px solid var(--cp-border);border-radius:12px;cursor:pointer}
+.cp-fav[aria-pressed="true"]{outline:2px solid var(--cp-accent)}
+.cp-headrow{display:grid;grid-template-columns:1fr 56px;gap:8px;padding:10px 12px;color:var(--cp-muted);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.cp-list{max-height:min(60vh,520px);overflow:auto;padding-bottom:10px}
+.cp-item{display:grid;grid-template-columns:1fr 56px;gap:8px;align-items:center;height:44px;padding:0 12px;border-top:1px solid var(--cp-border)}
+.cp-item:hover{background:var(--cp-hover)}
+.cp-title{display:flex;align-items:center;gap:8px;min-width:0}
+.cp-title .cp-star{width:18px;height:18px;opacity:.9;cursor:pointer}
+.cp-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-market{text-align:right;color:var(--cp-muted);font-size:12.5px}
+
+/* ===== Expiry Popup (mobile) ===== */
+:root{
+    --ex-panel:#1c2532; --ex-panel-2:#111a24;
+    --ex-text:#e3eefc;  --ex-muted:#8aa4c0;
+    --ex-border:#243244;--ex-accent:#3ba3ff;
+    --ex-hover:#223044; --ex-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+.ex-overlay{position:fixed;inset:0;background:rgba(4,10,16,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.ex-overlay[aria-hidden="false"]{display:flex}
+.ex{width:100%;max-width:420px;background:var(--ex-panel);border:1px solid var(--ex-border);border-radius:18px;box-shadow:var(--ex-shadow);overflow:hidden;color:var(--ex-text)}
+.ex-header{padding:12px 14px;border-bottom:1px solid var(--ex-border);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 60%)}
+.ex-title{font-weight:600}
+.ex-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr); /* три в строку */
+    gap:10px;
+    padding:12px;
+}
+.ex-chip{
+    height:40px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:12px;
+    background:var(--ex-panel-2);
+    border:1px solid var(--ex-border);
+    color:var(--ex-text);
+    font-weight:600;
+    letter-spacing:.01em;
+    cursor:pointer;user-select:none;
+    transition:background .12s ease, outline-color .12s ease, transform .06s ease;
+}
+.ex-chip:hover{background:var(--ex-hover)}
+.ex-chip:active{transform:translateY(1px)}
+.ex-chip[aria-selected="true"]{outline:2px solid var(--ex-accent); background:#0f2032}
+.ex-chip:focus-visible{outline:2px solid var(--ex-accent)}
+
+/* ===== Model Popup (mobile) ===== */
+:root{
+    --md-panel:#1c2532; --md-panel-2:#111a24;
+    --md-text:#e3eefc;  --md-muted:#8aa4c0;
+    --md-border:#243244;--md-accent:#3ba3ff;
+    --md-hover:#223044; --md-shadow:0 10px 30px rgba(0,0,0,.45);
+    --md-badge:#2a3750;
+}
+.md-overlay{position:fixed;inset:0;background:rgba(4,10,16,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.md-overlay[aria-hidden="false"]{display:flex}
+.md{width:100%;max-width:420px;background:var(--md-panel);border:1px solid var(--md-border);border-radius:18px;box-shadow:var(--md-shadow);overflow:hidden;color:var(--md-text)}
+.md-header{padding:12px 14px;border-bottom:1px solid var(--md-border);background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 60%)}
+.md-title{font-weight:600}
+.md-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr); /* две в строку */
+    gap:10px;
+    padding:12px;
+}
+.md-chip{
+    min-height:56px;
+    display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;
+    border-radius:12px;
+    background:var(--md-panel-2);
+    border:1px solid var(--md-border);
+    color:var(--md-text);
+    font-weight:600;
+    letter-spacing:.01em;
+    cursor:pointer;user-select:none;
+    transition:background .12s ease, outline-color .12s ease, transform .06s ease;
+    text-align:center;
+    padding:6px 8px;
+}
+.md-chip:hover{background:var(--md-hover)}
+.md-chip:active{transform:translateY(1px)}
+.md-chip[aria-selected="true"]{outline:2px solid var(--md-accent); background:#0f2032}
+.md-chip.is-disabled{
+    opacity:.55; cursor:not-allowed; filter:saturate(.7);
+    background:var(--md-panel-2);
+    border-style:dashed;
+}
+.md-chip .md-badge{
+    font-size:11px; line-height:1;
+    color:var(--md-muted);
+    background:var(--md-badge);
+    border:1px solid var(--md-border);
+    padding:4px 6px;
+    border-radius:8px;
+}
+
+/* ===== Signal (analysis/result) ===== */
+.glass-signal{ position:relative; overflow:hidden; transition:margin-top .25s ease, box-shadow .25s ease; }
+body.analysis-open .glass-signal{ margin-top:-12px; box-shadow:0 16px 48px rgba(0,0,0,.45); }
+
+.signal-top{ display:flex; align-items:center; justify-content:space-between; padding:6px 6px 10px; border-bottom:1px solid #243244; }
+.signal-title{ display:flex; gap:8px; align-items:center; font-weight:700; }
+.signal-model{ color:#8aa4c0; }
+
+.sig-steps{ list-style:none; margin:10px 0 12px; padding:0; display:grid; gap:10px; }
+.sig-step{ display:flex; gap:10px; align-items:flex-start; background:#111a24; border:1px solid #243244; border-radius:12px; padding:10px; }
+.sig-step .dot{ width:16px; height:16px; border-radius:50%; border:2px solid #3ba3ff; margin-top:2px; position:relative; }
+.sig-step.running .dot{ background:#0f2032; box-shadow:0 0 0 3px rgba(59,163,255,.15); }
+.sig-step.done    .dot{ background:#3ba3ff; border-color:#3ba3ff; }
+.sig-step b{ display:block; }
+.sig-step .sub{ color:#8aa4c0; font-size:12px; }
+
+.sig-progress{ height:6px; border-radius:999px; background:#111a24; border:1px solid #243244; overflow:hidden; }
+.sig-progress .bar{ height:100%; width:0; background:#3ba3ff; transition:width .12s linear; }
+
+.sig-result{ padding-top:8px; }
+.sig-result .dir{ text-align:center; font-weight:800; font-size:34px; margin:8px 0 12px; letter-spacing:.04em; }
+.sig-result .dir.up{ color:#49ff9a; } .sig-result .dir.down{ color:#ff5b5b; }
+
+.sig-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.sig-grid .kv{ background:#111a24; border:1px solid #243244; border-radius:12px; padding:10px; }
+.sig-grid .k{ color:#8aa4c0; font-size:12px; } .sig-grid .v{ font-weight:700; }
+.sig-grid .pct{ font-weight:800; font-size:20px; }
+
+.sig-actions{ display:flex; gap:10px; justify-content:center; margin:14px 0 4px; }
+.btn-primary{ background:#3ba3ff; color:#061320; border:none; border-radius:12px; padding:10px 16px; font-weight:700; }
+.btn-ghost{ background:#111a24; color:#e3eefc; border:1px solid #243244; border-radius:12px; padding:10px 16px; font-weight:700; }
+
+/* по умолчанию показываем иконку, прячем анализ */
+.sig-analysis { display: none; }
+
+/* при запуске анализа: иконку прячем, анализ показываем */
+body.analysis-open .wave-loader { display: none; }
+body.analysis-open .sig-analysis { display: block; }
+
+.wave-loader { transition: opacity .2s ease, transform .2s ease; }
+body.analysis-open .wave-loader { opacity: 0; transform: scale(.95); }
+
+/* Поднятие карточки сигнала над формой */
+.glass-card{
+    transition: opacity .25s ease, filter .25s ease;
+}
+
+.glass-signal{
+    position: relative;
+    z-index: 2;
+    transition: margin-top .28s ease, box-shadow .28s ease, transform .28s ease;
+    will-change: margin-top, transform;
+}
+
+/* переменная --raise выставляется из JS */
+body.analysis-open .glass-signal{
+    margin-top: calc(-1 * var(--raise, 0px)); /* поднимаем ровно на высоту формы */
+    z-index: 10;                               /* поверх формы */
+    box-shadow: 0 18px 56px rgba(0,0,0,.5);
+}
+
+/* приглушаем форму, чтобы визуально она ушла под сигнал */
+body.analysis-open .glass-card{
+    opacity: .65;
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+/* плавное исчезновение твоей иконки и показ анализа */
+.wave-loader{ transition: opacity .2s ease, transform .2s ease; }
+.sig-analysis{ display: none; }
+body.analysis-open .wave-loader{ opacity: 0; transform: scale(.96); }
+body.analysis-open .sig-analysis{ display: block; }
 

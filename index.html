@@ -32,8 +32,6 @@
         </div>
     </header>
 
-
-
     <main class="main">
         <!-- Заголовок -->
         <div class="main-heading">
@@ -48,7 +46,7 @@
                 <input type="text" id="pairField" placeholder="Выбери пару" readonly />
             </div>
 
-            <div class="field-block" onclick="selectField('time')">
+            <div class="field-block" onclick="selectField('expiry')">
                 <label>Время экспирации</label>
                 <input type="text" id="timeField" placeholder="Выбери время" readonly />
             </div>
@@ -72,14 +70,47 @@
                     Модель: <span id="selectedModel">NeuralEdge V1</span>
                 </div>
             </div>
+
             <div class="signal-bottom">
-                <!-- 🔄 Анимированная иконка вместо текста -->
+                <!-- Твоя анимированная иконка (по умолчанию видна; при анализе скрывается CSS-ом) -->
                 <svg class="wave-loader" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2">
                         <animate attributeName="stroke-dasharray" values="120;20;120" dur="1.5s" repeatCount="indefinite" />
                         <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" />
                     </path>
                 </svg>
+
+                <!-- Экран анализа -->
+                <div id="sigAnalysis" class="sig-analysis">
+                    <ul class="sig-steps" id="sigSteps">
+                        <li class="sig-step"><span class="dot"></span><div><b>Technical analysis</b><div class="sub">Indicators &amp; S/R</div></div></li>
+                        <li class="sig-step"><span class="dot"></span><div><b>Pattern recognition</b><div class="sub">Trends &amp; figures</div></div></li>
+                        <li class="sig-step"><span class="dot"></span><div><b>Mathematical calculations</b><div class="sub">Probabilities &amp; risks</div></div></li>
+                        <li class="sig-step"><span class="dot"></span><div><b>Signal generation</b><div class="sub">Final assembling</div></div></li>
+                        <li class="sig-step"><span class="dot"></span><div><b>Validation</b><div class="sub">Consistency check</div></div></li>
+                    </ul>
+                    <div class="sig-progress"><div class="bar" id="sigProgress" style="width:0%"></div></div>
+                </div>
+
+                <!-- Экран результата -->
+                <div id="sigResult" class="sig-result" hidden>
+                    <div class="dir" id="sigDirection">UP</div>
+                    <div class="sig-grid">
+                        <div class="kv"><div class="k">MARKET:</div><div class="v" id="sigMarket">—</div></div>
+                        <div class="kv"><div class="k">CONFIDENCE:</div><div class="v" id="sigConf">—</div></div>
+                        <div class="kv"><div class="k">TIME:</div><div class="v" id="sigTime">—</div></div>
+                        <div class="kv"><div class="k">STRENGTH:</div><div class="v" id="sigStrength">—</div></div>
+                        <div class="kv"><div class="k">PAIR:</div><div class="v" id="sigPair">—</div></div>
+                        <div class="kv"><div class="k">VALID UNTIL:</div><div class="v" id="sigValid">—</div></div>
+                        <div class="kv"><div class="k"><span class="pct" id="sigAcc">—</span></div><div class="v">ACCURACY</div></div>
+                        <div class="kv"><div class="k" id="sigVol">—</div><div class="v">VOLUME</div></div>
+                    </div>
+
+                    <div class="sig-actions">
+                        <button class="btn-primary" id="sigRepeat">Repeat</button>
+                        <button class="btn-ghost"   id="sigReset">Reset</button>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -120,12 +151,72 @@
 
         </div>
     </section>
-
-
 </div>
 
+<!-- POPUP: выбор валютной пары -->
+<div class="cp-overlay" id="cpPopup" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="cp" role="document">
+        <div class="cp-header">
+            <div class="cp-tabs" id="cpTabs">
+                <button class="cp-tab" data-tab="fiat" aria-selected="true"  title="Валюты">
+                    <img src="images/icons/Dollar.svg" alt="$" />
+                </button>
+                <button class="cp-tab" data-tab="crypto" aria-selected="false" title="Криптовалюта">
+                    <img src="images/icons/Btc.svg" alt="₿" />
+                </button>
+                <button class="cp-tab" data-tab="commod" aria-selected="false" title="Сырьевые товары">
+                    <img src="images/icons/BaselineWaterDrop.svg" alt="oil" />
+                </button>
+                <button class="cp-tab" data-tab="stocks" aria-selected="false" title="Акции">
+                    <img src="images/icons/GraphArrowIncreaseSolid.svg" alt="stocks" />
+                </button>
+                <button class="cp-tab" data-tab="docs" aria-selected="false" title="Индексы">
+                    <img src="images/icons/Document.svg" alt="docs" />
+                </button>
+            </div>
 
+            <div class="cp-search-row">
+                <div class="cp-search">
+                    <img class="cp-icon-left" src="images/icons/SearchOutlined.svg" width="18" height="18" alt="Поиск" />
+                    <input id="cpSearch" type="search" autocomplete="off" placeholder="Поиск" />
+                </div>
+                <button id="cpFavOnly" class="cp-fav" aria-pressed="false" title="Только избранное">
+                    <img src="images/icons/StarFilled.svg" width="18" height="18" alt="Избранное" />
+                </button>
+            </div>
+        </div>
 
+        <div class="cp-headrow">
+            <div id="cpLeftTitle">Валюты</div>
+            <div style="text-align:right;">Рынок</div>
+        </div>
+
+        <div class="cp-list" id="cpList"></div>
+    </div>
+</div>
+<!-- /POPUP -->
+
+<!-- POPUP: время экспирации -->
+<div class="ex-overlay" id="exPopup" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="ex" role="document">
+        <div class="ex-header">
+            <div class="ex-title">Время экспирации</div>
+        </div>
+        <div class="ex-grid" id="exGrid"><!-- рендер из JS --></div>
+    </div>
+</div>
+<!-- /POPUP -->
+
+<!-- POPUP: выбор AI модели -->
+<div class="md-overlay" id="mdPopup" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="md" role="document">
+        <div class="md-header">
+            <div class="md-title">AI модель</div>
+        </div>
+        <div class="md-grid" id="mdGrid"><!-- рендер из JS --></div>
+    </div>
+</div>
+<!-- /POPUP -->
 
 <script src="scripts/main.js"></script>
 </body>
