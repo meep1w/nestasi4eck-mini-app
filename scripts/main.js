@@ -444,7 +444,7 @@ const I18N = {
     // ===== ES =====
     es: {
         app_title: "Pocket Signals",
-        header_become_vip: "Hazte VIP",
+
         lang_select_aria: "Seleccionar idioma",
         hero_title: "Opera con IA",
         hero_sub: "Señales inteligentes para un trading rentable",
