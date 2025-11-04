@@ -1,69 +1,201 @@
-// ===== VIP индикатор =====
+// =============================
+// VIP индикатор
+// =============================
+// VIP: открытие нижней шторки + индикатор
 document.addEventListener("DOMContentLoaded", () => {
     const vipBtn = document.getElementById("vipBtn");
     const vipIndicator = document.getElementById("vipIndicator");
+    const sheet = document.getElementById("vipSheet");
 
     const viewed = localStorage.getItem("vipViewed");
-    if (!viewed) vipIndicator.style.display = "block";
+    if (!viewed && vipIndicator) vipIndicator.style.display = "block";
 
-    vipBtn?.addEventListener("click", () => {
-        vipIndicator.style.display = "none";
-        localStorage.setItem("vipViewed", "true");
-        // TODO: открыть твой VIP-попап
+    function openVip(){
+        if (vipIndicator) { vipIndicator.style.display = "none"; localStorage.setItem("vipViewed","true"); }
+        sheet?.setAttribute("aria-hidden","false");
+        document.body.style.overflow = "hidden";
+    }
+    function closeVip(){
+        sheet?.setAttribute("aria-hidden","true");
+        document.body.style.overflow = "";
+    }
+
+    vipBtn?.addEventListener("click", openVip);
+
+    // общие закрытия
+    sheet?.addEventListener("click", (e) => {
+        const t = e.target;
+        if (t.matches("[data-close]") || t.closest("#vipClose")) closeVip();
+    });
+    document.getElementById("vipClose")?.addEventListener("click", closeVip);
+    document.getElementById("vipLater")?.addEventListener("click", closeVip);
+
+    // ESC
+    document.addEventListener("keydown", (e)=>{ if (e.key === "Escape" && sheet && sheet.getAttribute("aria-hidden")==="false") closeVip(); });
+
+    // Свайп вниз (очень простой)
+    let startY = null;
+    sheet?.addEventListener("touchstart", (e)=>{ startY = e.touches[0].clientY; }, {passive:true});
+    sheet?.addEventListener("touchmove",  (e)=>{ /* no-op */ }, {passive:true});
+    sheet?.addEventListener("touchend",   (e)=>{
+        if (startY == null) return;
+        const dy = (e.changedTouches[0].clientY - startY);
+        if (dy > 80) closeVip();
+        startY = null;
+    });
+
+    // CTA
+    document.getElementById("vipGet")?.addEventListener("click", ()=>{
+        // Здесь можно дернуть оплату/страницу тарифа
+        // Пока просто закрываем и помечаем интерес
+        localStorage.setItem("vipIntent","1");
+        closeVip();
     });
 });
 
-// ===== Глобальный стейт =====
+
+// =============================
+// Глобальный стейт (форма)
+// =============================
 let state = {
     pair: null,
-    time: null,            // строка типа "S5/M1/..."
-    expiry: null,          // дублирующая метка (если нужно)
+    time: null,            // "S5/M1/..."
+    expiry: null,          // дублирующая метка
     expirySeconds: null,   // число секунд
     model: null
 };
 
-// ===== Выбор полей (открытие попапов) =====
-function selectField(field) {
-    if (field === 'pair')   { CurrencyPairPopup.open();   return; }
-    if (field === 'expiry') { CurrencyExpiryPopup.open(); return; }
-    if (field === 'model')  { CurrencyModelPopup.open();  return; }
+// =============================
+// Персистентность
+// =============================
+const STATE_KEY  = "ps_state_v1";          // состояние формы (пара, время, модель)
+const RESULT_KEY = "ps_last_result_v1";    // последний показанный результат
+const LANG_KEY   = "ps_lang_v1";           // выбранный язык
 
-    // fallback
+function saveState() {
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (_) {}
+}
+
+function restoreState() {
+    try {
+        const raw = localStorage.getItem(STATE_KEY);
+        if (!raw) return;
+        const s = JSON.parse(raw) || {};
+
+        state.pair = s.pair ?? null;
+        state.time = s.time ?? null;
+        state.expiry = s.expiry ?? null;
+        state.expirySeconds = Number.isFinite(s.expirySeconds) ? s.expirySeconds : null;
+        state.model = s.model ?? null;
+
+        const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null) el.value = v; };
+        setVal("pairField",  state.pair);
+        setVal("timeField",  state.time);
+        setVal("modelField", state.model);
+
+        const mSpan = document.getElementById("selectedModel");
+        if (mSpan && state.model) mSpan.textContent = state.model;
+
+        checkReady();
+    } catch(_) {}
+}
+
+function saveResult(res) {
+    try { localStorage.setItem(RESULT_KEY, JSON.stringify(res)); } catch (_) {}
+}
+
+function restoreResult() {
+    try {
+        const raw = localStorage.getItem(RESULT_KEY);
+        if (!raw) return;
+        const r = JSON.parse(raw);
+
+        // 1) Направление + иконка
+        const dirEl = document.getElementById("sigDirection");
+        if (dirEl) {
+            dirEl.textContent = r.isBuy ? "ПОКУПКА" : "ПРОДАЖА";
+            dirEl.classList.toggle("buy",  !!r.isBuy);
+            dirEl.classList.toggle("sell", !r.isBuy);
+        }
+        const iconBox = document.getElementById("sigDirIcon");
+        if (iconBox) iconBox.innerHTML = r.isBuy ? BUY_SVG : SELL_SVG;
+
+        // 2) Параметры
+        const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v ?? "—"; };
+        setText("sigPair",     r.pair);
+        setText("sigConf",     r.conf);
+        setText("sigAcc",      r.acc);
+        setText("sigMarket",   r.market);
+        setText("sigStrength", r.strRu);
+        setText("sigVol",      r.volRu);
+        setText("sigTime",     r.time);
+        setText("sigValid",    r.valid);
+
+        // 3) Показать экран результата и поднять карточку
+        const viewA = document.getElementById("sigAnalysis");
+        const viewR = document.getElementById("sigResult");
+        if (viewA && viewR) {
+            viewA.style.display = "none";
+            viewR.hidden = false;
+        }
+
+        const form = document.querySelector(".glass-card");
+        if (form) {
+            const raise = Math.ceil(form.getBoundingClientRect().height + 16);
+            document.body.style.setProperty("--raise", `${raise}px`);
+        }
+        document.body.classList.add("analysis-open");
+    } catch(_) {}
+}
+
+// =============================
+// Вспомогательное UI
+// =============================
+function selectField(field) {
+    if (field === "pair")   { CurrencyPairPopup.open();   return; }
+    if (field === "expiry") { CurrencyExpiryPopup.open(); return; }
+    if (field === "model")  { CurrencyModelPopup.open();  return; }
+
     const value = prompt(`Выбери значение для: ${field}`);
     if (!value) return;
     state[field] = value;
     const el = document.getElementById(`${field}Field`);
     if (el) el.value = value;
     checkReady();
+    saveState();
 }
 
-// ===== Готовность кнопки =====
 function checkReady() {
-    const btn = document.getElementById('getSignalBtn');
+    const btn = document.getElementById("getSignalBtn");
     const allFilled = !!(state.pair && state.time && state.model);
+    if (!btn) return;
     if (allFilled) {
-        btn.classList.add('active');
-        btn.removeAttribute('disabled');
+        btn.classList.add("active");
+        btn.removeAttribute("disabled");
     } else {
-        btn.classList.remove('active');
-        btn.setAttribute('disabled', 'true');
+        btn.classList.remove("active");
+        btn.setAttribute("disabled", "true");
     }
 }
 
-// Показ текущей модели в заголовке сигнала при загрузке
-document.addEventListener('DOMContentLoaded', () => {
-    const model = state.model || document.getElementById('modelField')?.value || 'NeuralEdge V1';
-    const span = document.getElementById('selectedModel');
+// Показ текущей модели при первом рендере
+document.addEventListener("DOMContentLoaded", () => {
+    const model = state.model || document.getElementById("modelField")?.value || "NeuralEdge V1";
+    const span = document.getElementById("selectedModel");
     if (span) span.innerText = model;
 });
 
-// ===== FAQ =====
+// =============================
+// FAQ
+// =============================
 function toggleFAQ(button) {
-    const item = button.closest('.faq-item');
-    item.classList.toggle('open');
+    const item = button.closest(".faq-item");
+    item.classList.toggle("open");
 }
 
-// ===== Языки =====
+// =============================
+// Языки
+// =============================
 const SUP_LANGS = [
     { code: "ru", label: "Русский", short: "RU" },
     { code: "en", label: "English", short: "EN" },
@@ -82,12 +214,13 @@ const langCode = document.getElementById("langCode");
 
 function setCurrentLang(code) {
     const found = SUP_LANGS.find(l => l.code === code) || SUP_LANGS[0];
-    langFlag.src = `images/flags/${found.code}.svg`;
-    langFlag.alt = found.short;
-    langCode.textContent = found.short;
+    if (langFlag) { langFlag.src = `images/flags/${found.code}.svg`; langFlag.alt = found.short; }
+    if (langCode) langCode.textContent = found.short;
+    try { localStorage.setItem(LANG_KEY, found.code); } catch(_) {}
 }
 
 function renderLangMenu() {
+    if (!langMenu) return;
     langMenu.innerHTML = "";
     SUP_LANGS.forEach(({ code, label, short }) => {
         const li = document.createElement("li");
@@ -96,7 +229,7 @@ function renderLangMenu() {
         btn.addEventListener("click", () => {
             setCurrentLang(code);
             langMenu.classList.remove("open");
-            langWrap.classList.remove("open");
+            langWrap?.classList.remove("open");
         });
         li.appendChild(btn);
         langMenu.appendChild(li);
@@ -104,12 +237,13 @@ function renderLangMenu() {
 }
 
 langBtn?.addEventListener("click", () => {
-    const isOpen = langMenu.classList.contains("open");
-    langMenu.classList.toggle("open", !isOpen);
-    langWrap.classList.toggle("open", !isOpen);
+    const isOpen = langMenu?.classList.contains("open");
+    langMenu?.classList.toggle("open", !isOpen);
+    langWrap?.classList.toggle("open", !isOpen);
 });
 
 document.addEventListener("click", (e) => {
+    if (!langWrap || !langMenu) return;
     if (!langWrap.contains(e.target)) {
         langMenu.classList.remove("open");
         langWrap.classList.remove("open");
@@ -117,10 +251,50 @@ document.addEventListener("click", (e) => {
 });
 
 renderLangMenu();
-setCurrentLang("ru");
+// восстановим язык
+setCurrentLang(localStorage.getItem(LANG_KEY) || "ru");
+
+// =============================
+// Direction icons (inline SVG)
+// =============================
+const SELL_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+  <title>Download-loop SVG Icon</title>
+  <g stroke="#ff0000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path fill="none" stroke-dasharray="14" stroke-dashoffset="14" d="M6 19h12">
+      <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="14;0"/>
+    </path>
+    <path fill="#ff0000" d="M12 4 h2 v6 h2.5 L12 14.5M12 4 h-2 v6 h-2.5 L12 14.5">
+      <animate attributeName="d" calcMode="linear" dur="1.5s" keyTimes="0;0.7;1" repeatCount="indefinite"
+               values="M12 4 h2 v6 h2.5 L12 14.5M12 4 h-2 v6 h-2.5 L12 14.5;
+                       M12 4 h2 v3 h2.5 L12 11.5M12 4 h-2 v3 h-2.5 L12 11.5;
+                       M12 4 h2 v6 h2.5 L12 14.5M12 4 h-2 v6 h-2.5 L12 14.5"/>
+    </path>
+  </g>
+</svg>`;
+
+const BUY_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+  <title>Upload-loop SVG Icon</title>
+  <g stroke="#32ac41" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path fill="none" stroke-dasharray="14" stroke-dashoffset="14" d="M6 19h12">
+      <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.4s" values="14;0"/>
+    </path>
+    <path fill="#32ac41" d="M12 15 h2 v-6 h2.5 L12 4.5M12 15 h-2 v-6 h-2.5 L12 4.5">
+      <animate attributeName="d" calcMode="linear" dur="1.5s" keyTimes="0;0.7;1" repeatCount="indefinite"
+               values="M12 15 h2 v-6 h2.5 L12 4.5M12 15 h-2 v-6 h-2.5 L12 4.5;
+                       M12 15 h2 v-3 h2.5 L12 7.5M12 15 h-2 v-3 h-2.5 L12 7.5;
+                       M12 15 h2 v-6 h2.5 L12 4.5M12 15 h-2 v-6 h-2.5 L12 4.5"/>
+    </path>
+  </g>
+</svg>`;
+
+// Сразу после инициализации — восстановим форму/результат
+restoreState();
+restoreResult();
 
 // ===============================
-// ===== Currency Pair Popup =====
+// Currency Pair Popup
 // ===============================
 (function(){
     const DATA = {
@@ -318,30 +492,30 @@ setCurrentLang("ru");
     };
 
     const CP_TAB_TITLES = {
-        fiat: 'Валюты',
-        crypto: 'Криптовалюта',
-        commod: 'Сырьевые товары',
-        stocks: 'Акции',
-        docs: 'Индексы',
-        fav: 'Избранное',
-        search: 'Поиск'
+        fiat: "Валюты",
+        crypto: "Криптовалюта",
+        commod: "Сырьевые товары",
+        stocks: "Акции",
+        docs: "Индексы",
+        fav: "Избранное",
+        search: "Поиск"
     };
 
-    const favKey = 'pair_favorites_v1';
-    const favSet = new Set(JSON.parse(localStorage.getItem(favKey) || '[]'));
+    const favKey = "pair_favorites_v1";
+    const favSet = new Set(JSON.parse(localStorage.getItem(favKey) || "[]"));
 
-    let currentTab = 'fiat';
+    let currentTab = "fiat";
     let favOnly = false;
-    let query = '';
+    let query = "";
 
-    const overlay     = document.getElementById('cpPopup');
-    const list        = document.getElementById('cpList');
-    const leftTitle   = document.getElementById('cpLeftTitle');
-    const searchInput = document.getElementById('cpSearch');
-    const favOnlyBtn  = document.getElementById('cpFavOnly');
+    const overlay     = document.getElementById("cpPopup");
+    const list        = document.getElementById("cpList");
+    const leftTitle   = document.getElementById("cpLeftTitle");
+    const searchInput = document.getElementById("cpSearch");
+    const favOnlyBtn  = document.getElementById("cpFavOnly");
 
-    function open(){ overlay.setAttribute('aria-hidden','false'); render(); }
-    function close(){ overlay.setAttribute('aria-hidden','true'); }
+    function open(){ overlay.setAttribute("aria-hidden","false"); render(); }
+    function close(){ overlay.setAttribute("aria-hidden","true"); }
     function poolAll(){ return [].concat(DATA.fiat||[], DATA.crypto||[], DATA.commod||[], DATA.stocks||[], DATA.docs||[]); }
 
     function render(){
@@ -349,19 +523,19 @@ setCurrentLang("ru");
         let raw;
         if (q) {
             leftTitle.textContent = CP_TAB_TITLES.search;
-            favOnlyBtn.style.display = 'none';
+            favOnlyBtn.style.display = "none";
             raw = poolAll().filter(x => x.name.toLowerCase().includes(q));
-        } else if (currentTab === 'fav') {
+        } else if (currentTab === "fav") {
             leftTitle.textContent = CP_TAB_TITLES.fav;
-            favOnlyBtn.style.display = 'none';
+            favOnlyBtn.style.display = "none";
             raw = poolAll().filter(x => favSet.has(x.id));
         } else {
-            leftTitle.textContent = CP_TAB_TITLES[currentTab] || '—';
-            favOnlyBtn.style.display = '';
+            leftTitle.textContent = CP_TAB_TITLES[currentTab] || "—";
+            favOnlyBtn.style.display = "";
             raw = DATA[currentTab] || [];
         }
 
-        const filtered = raw.filter(item => (currentTab === 'fav' || q) ? true : (favOnly ? favSet.has(item.id) : true));
+        const filtered = raw.filter(item => (currentTab === "fav" || q) ? true : (favOnly ? favSet.has(item.id) : true));
 
         list.innerHTML = filtered.map(it => `
       <div class="cp-item" data-id="${it.id}">
@@ -369,12 +543,12 @@ setCurrentLang("ru");
           <img class="cp-star" data-star data-id="${it.id}" src="images/icons/StarFilled.svg" alt="★" style="opacity:${favSet.has(it.id)?1:.25}" />
           <div class="cp-name">${it.name}</div>
         </div>
-        <div class="cp-market">${it.market||''}</div>
+        <div class="cp-market">${it.market||""}</div>
       </div>
-    `).join('') || `<div style="padding:24px;color:var(--cp-muted);">Ничего не найдено</div>`;
+    `).join("") || `<div style="padding:24px;color:var(--cp-muted);">Ничего не найдено</div>`;
 
-        list.querySelectorAll('[data-star]').forEach(btn=>{
-            btn.addEventListener('click', (e)=>{
+        list.querySelectorAll("[data-star]").forEach(btn=>{
+            btn.addEventListener("click", (e)=>{
                 e.stopPropagation();
                 const id = btn.dataset.id;
                 if (favSet.has(id)) favSet.delete(id); else favSet.add(id);
@@ -383,76 +557,77 @@ setCurrentLang("ru");
             });
         });
 
-        list.querySelectorAll('.cp-item').forEach(row=>{
-            row.addEventListener('click', ()=>{
+        list.querySelectorAll(".cp-item").forEach(row=>{
+            row.addEventListener("click", ()=>{
                 const id = row.dataset.id;
                 const item = poolAll().find(x=>x.id===id);
                 if (!item) return;
                 state.pair = item.name;
-                const field = document.getElementById('pairField');
+                const field = document.getElementById("pairField");
                 if (field) field.value = item.name;
-                if (typeof window.checkReady === 'function') checkReady();
+                checkReady();
+                saveState();
                 close();
             });
         });
     }
 
-    document.getElementById('cpTabs').addEventListener('click', (e)=>{
-        const tab = e.target.closest('.cp-tab');
+    document.getElementById("cpTabs").addEventListener("click", (e)=>{
+        const tab = e.target.closest(".cp-tab");
         if (!tab) return;
-        document.querySelectorAll('.cp-tab').forEach(t=>t.setAttribute('aria-selected','false'));
-        tab.setAttribute('aria-selected','true');
+        document.querySelectorAll(".cp-tab").forEach(t=>t.setAttribute("aria-selected","false"));
+        tab.setAttribute("aria-selected","true");
         currentTab = tab.dataset.tab;
         render();
     });
 
-    searchInput.addEventListener('input', ()=>{ query = searchInput.value; render(); });
-    favOnlyBtn.addEventListener('click', ()=>{ favOnly = !favOnly; favOnlyBtn.setAttribute('aria-pressed', String(favOnly)); render(); });
-    overlay.addEventListener('click', (e)=>{ if (e.target === overlay) close(); });
+    searchInput.addEventListener("input", ()=>{ query = searchInput.value; render(); });
+    favOnlyBtn.addEventListener("click", ()=>{ favOnly = !favOnly; favOnlyBtn.setAttribute("aria-pressed", String(favOnly)); render(); });
+    overlay.addEventListener("click", (e)=>{ if (e.target === overlay) close(); });
 
     window.CurrencyPairPopup = { open, close, render };
 })();
 
 // =========================
-// ===== Expiry Popup =====
+// Expiry Popup
 // =========================
 (function(){
     const PRESETS = [
-        { id:'S5',  label:'S5',  seconds:5 },
-        { id:'S15', label:'S15', seconds:15 },
-        { id:'S30', label:'S30', seconds:30 },
-        { id:'M1',  label:'M1',  seconds:60 },
-        { id:'M3',  label:'M3',  seconds:180 },
-        { id:'M5',  label:'M5',  seconds:300 },
-        { id:'M30', label:'M30', seconds:1800 },
-        { id:'H1',  label:'H1',  seconds:3600 },
-        { id:'H4',  label:'H4',  seconds:14400 }
+        { id:"S5",  label:"S5",  seconds:5 },
+        { id:"S15", label:"S15", seconds:15 },
+        { id:"S30", label:"S30", seconds:30 },
+        { id:"M1",  label:"M1",  seconds:60 },
+        { id:"M3",  label:"M3",  seconds:180 },
+        { id:"M5",  label:"M5",  seconds:300 },
+        { id:"M30", label:"M30", seconds:1800 },
+        { id:"H1",  label:"H1",  seconds:3600 },
+        { id:"H4",  label:"H4",  seconds:14400 }
     ];
 
-    const overlay = document.getElementById('exPopup');
-    const grid    = document.getElementById('exGrid');
+    const overlay = document.getElementById("exPopup");
+    const grid    = document.getElementById("exGrid");
 
     let selectedId = null;
 
     function open(){
-        const field = document.getElementById('timeField');
+        const field = document.getElementById("timeField");
         const current = (field && field.value) ? field.value : (state.expiry || state.time || null);
         selectedId = current && PRESETS.some(p => p.label === current) ? current : null;
 
-        overlay.setAttribute('aria-hidden','false');
+        overlay.setAttribute("aria-hidden","false");
         render();
     }
-    function close(){ overlay.setAttribute('aria-hidden','true'); }
+    function close(){ overlay.setAttribute("aria-hidden","true"); }
 
     function render(){
         grid.innerHTML = PRESETS.map(p => `
       <button class="ex-chip" data-id="${p.id}" aria-selected="${p.label===selectedId}">
         ${p.label}
       </button>
-    `).join('');
+    `).join("");
 
-        grid.querySelectorAll('.ex-chip').forEach(btn=>{
-            btn.addEventListener('click', ()=>{
+        grid.querySelectorAll(".ex-chip").forEach(btn=>{
+            btn.addEventListener("click", ()=>{
                 const id = btn.dataset.id;
                 const item = PRESETS.find(x=>x.id===id);
                 if (!item) return;
@@ -464,73 +639,73 @@ setCurrentLang("ru");
     }
 
     function setExpiryUI(item){
-        // ключевой фикс для готовности кнопки
-        state.time = item.label;          // для checkReady()
-        state.expiry = item.label;        // если где-то читается expiry
+        state.time = item.label;
+        state.expiry = item.label;
         state.expirySeconds = item.seconds;
 
         const targets = [
-            document.getElementById('timeField'),
-            document.getElementById('expiryField'),
+            document.getElementById("timeField"),
+            document.getElementById("expiryField"),
             document.querySelector('[data-field="expiry"]'),
-            document.querySelector('.js-expiry'),
+            document.querySelector(".js-expiry"),
             document.querySelector('input[name="expiry"]')
         ].filter(Boolean);
 
         targets.forEach(el => {
-            if ('value' in el) el.value = item.label; else el.textContent = item.label;
+            if ("value" in el) el.value = item.label; else el.textContent = item.label;
             try {
-                el.dispatchEvent(new Event('input',  { bubbles: true }));
-                el.dispatchEvent(new Event('change', { bubbles: true }));
+                el.dispatchEvent(new Event("input",  { bubbles: true }));
+                el.dispatchEvent(new Event("change", { bubbles: true }));
             } catch(_) {}
         });
 
-        if (typeof window.checkReady === 'function') checkReady();
+        checkReady();
+        saveState();
     }
 
-    overlay.addEventListener('click', (e)=>{ if (e.target === overlay) close(); });
+    overlay.addEventListener("click", (e)=>{ if (e.target === overlay) close(); });
 
     window.CurrencyExpiryPopup = { open, close };
 })();
 
 // ========================
-// ===== Model Popup  =====
+// Model Popup
 // ========================
 (function(){
     const MODELS = [
-        { id: 'NE_V1', label: 'NeuralEdge V1', disabled: false },
-        { id: 'NE_V2', label: 'NeuralEdge V2', disabled: true, note: 'Только для VIP' }
+        { id: "NE_V1", label: "NeuralEdge V1", disabled: false },
+        { id: "NE_V2", label: "NeuralEdge V2", disabled: true, note: "Только для VIP" }
     ];
 
-    const overlay = document.getElementById('mdPopup');
-    const grid    = document.getElementById('mdGrid');
+    const overlay = document.getElementById("mdPopup");
+    const grid    = document.getElementById("mdGrid");
 
     let selectedId = null;
 
     function open(){
-        const field = document.getElementById('modelField');
+        const field = document.getElementById("modelField");
         const current = (field && field.value) ? field.value : (state.model || null);
         selectedId = current && MODELS.some(m => m.label === current) ? current : null;
 
-        overlay.setAttribute('aria-hidden','false');
+        overlay.setAttribute("aria-hidden","false");
         render();
     }
-    function close(){ overlay.setAttribute('aria-hidden','true'); }
+    function close(){ overlay.setAttribute("aria-hidden","true"); }
 
     function render(){
         grid.innerHTML = MODELS.map(m => `
       <button
-        class="md-chip${m.disabled ? ' is-disabled' : ''}"
+        class="md-chip${m.disabled ? " is-disabled" : ""}"
         data-id="${m.id}"
-        ${m.disabled ? 'aria-disabled="true" disabled' : ''}
+        ${m.disabled ? 'aria-disabled="true" disabled' : ""}
         aria-selected="${m.label===selectedId}">
         <span>${m.label}</span>
-        ${m.note ? `<span class="md-badge">${m.note}</span>` : ''}
+        ${m.note ? `<span class="md-badge">${m.note}</span>` : ""}
       </button>
-    `).join('');
+    `).join("");
 
-        grid.querySelectorAll('.md-chip').forEach(btn=>{
-            btn.addEventListener('click', ()=>{
+        grid.querySelectorAll(".md-chip").forEach(btn=>{
+            btn.addEventListener("click", ()=>{
                 const id = btn.dataset.id;
                 const item = MODELS.find(x=>x.id===id);
                 if (!item || item.disabled) return;
@@ -545,79 +720,69 @@ setCurrentLang("ru");
         state.model = item.label;
 
         const targets = [
-            document.getElementById('modelField'),
-            document.getElementById('selectedModel'),
+            document.getElementById("modelField"),
+            document.getElementById("selectedModel"),
             document.querySelector('[data-field="model"]'),
-            document.querySelector('.js-model'),
+            document.querySelector(".js-model"),
             document.querySelector('input[name="model"]')
         ].filter(Boolean);
 
         targets.forEach(el => {
-            if ('value' in el) el.value = item.label; else el.textContent = item.label;
+            if ("value" in el) el.value = item.label; else el.textContent = item.label;
             try {
-                el.dispatchEvent(new Event('input',  { bubbles: true }));
-                el.dispatchEvent(new Event('change', { bubbles: true }));
+                el.dispatchEvent(new Event("input",  { bubbles: true }));
+                el.dispatchEvent(new Event("change", { bubbles: true }));
             } catch(_) {}
         });
 
-        if (typeof window.checkReady === 'function') checkReady();
+        checkReady();
+        saveState();
     }
 
-    overlay.addEventListener('click', (e)=>{ if (e.target === overlay) close(); });
+    overlay.addEventListener("click", (e)=>{ if (e.target === overlay) close(); });
 
     window.CurrencyModelPopup = { open, close };
 })();
 
 // ===============================================
-// ===== Signal flow (анимация анализа -> результат)
+// Поток сигнала (анализ -> результат)
 // ===============================================
 (function(){
-    const steps = [
-        'Technical analysis',
-        'Pattern recognition',
-        'Mathematical calculations',
-        'Signal generation',
-        'Validation'
-    ];
+    const steps = ["A","B","C","D","E"];
 
-    const list   = document.getElementById('sigSteps');
-    const bar    = document.getElementById('sigProgress');
-    const viewA  = document.getElementById('sigAnalysis');
-    const viewR  = document.getElementById('sigResult');
+    const list   = document.getElementById("sigSteps");
+    const bar    = document.getElementById("sigProgress");
+    const viewA  = document.getElementById("sigAnalysis");
+    const viewR  = document.getElementById("sigResult");
 
     const q = (id) => document.getElementById(id);
 
     // Кнопки
-    q('getSignalBtn')?.addEventListener('click', start);
-    q('sigRepeat')?.addEventListener('click', start);
-    q('sigReset')?.addEventListener('click', resetAll);
+    q("getSignalBtn")?.addEventListener("click", start);
+    q("sigRepeat")?.addEventListener("click", start);
+    q("sigReset")?.addEventListener("click", resetAll);
 
     function start(){
-        const pair  = q('pairField')?.value.trim();
-        const time  = q('timeField')?.value.trim();
-        const model = q('modelField')?.value.trim();
+        const pair  = q("pairField")?.value.trim();
+        const time  = q("timeField")?.value.trim();
+        const model = q("modelField")?.value.trim();
         if (!pair || !time || !model) return;
 
-        // показываем выбранную модель в заголовке
-        const mSpan = document.getElementById('selectedModel');
+        const mSpan = document.getElementById("selectedModel");
         if (mSpan) mSpan.textContent = model;
 
-        // === ВАЖНО: считаем высоту формы и поднимем карточку сигнала ===
-        const form = document.querySelector('.glass-card');
-        const signal = document.querySelector('.glass-signal');
-        if (form && signal) {
-            // расстояние, на которое нужно поднять сигнал: высота формы + наружный зазор (16px)
+        const form = document.querySelector(".glass-card");
+        if (form) {
             const raise = Math.ceil(form.getBoundingClientRect().height + 16);
-            document.body.style.setProperty('--raise', `${raise}px`);
+            document.body.style.setProperty("--raise", `${raise}px`);
         }
 
-        document.body.classList.add('analysis-open');
+        document.body.classList.add("analysis-open");
         viewR.hidden = true;
-        viewA.style.display = '';
+        viewA.style.display = "";
 
-        // сброс шагов/прогресса
-        [...list.querySelectorAll('.sig-step')].forEach(li => li.classList.remove('running','done'));
-        bar.style.width = '0%';
+        resetSigSteps();
+        setSigStepsState(0);
 
         const totalMs = 3400;
         const perStep = Math.floor(totalMs / steps.length);
@@ -626,68 +791,91 @@ setCurrentLang("ru");
         const timer = setInterval(()=>{
             const elapsed = performance.now() - t0;
             const p = Math.min(1, elapsed / totalMs);
-            bar.style.width = (p*100).toFixed(1) + '%';
-
             const idx = Math.min(steps.length-1, Math.floor(elapsed / perStep));
-            [...list.children].forEach((li,i)=>{
-                li.classList.toggle('running', i === idx && p < 1);
-                if (i < idx) li.classList.add('done');
-            });
+            setSigStepsState(idx);
 
             if (p >= 1){
                 clearInterval(timer);
+                setSigStepsState(_sigSteps.length);
+                if (_sigBar) _sigBar.style.width = "100%";
                 showResult(pair, time);
             }
         }, 60);
     }
 
     function showResult(pair, time){
-        const dir = Math.random() < 0.5 ? 'DOWN' : 'UP';
+        // демо-данные
+        const dir  = Math.random() < 0.5 ? "DOWN" : "UP";
         const conf = rand(72, 96);
         const acc  = rand(40, 88);
-        const strength = Math.random() < 0.65 ? 'High' : 'Medium';
-        const vol = ['Low','Medium','High'][rand(0,2)];
-        const market = /OTC/i.test(pair) ? 'OTC' : '';
 
-        let valid = '—';
+        const strength = (Math.random() < 0.65 ? "High" : "Medium");
+        const strengthRu = strength === "High" ? "Сильный" : "Средний";
+
+        const volEn = ["Low","Medium","High"][rand(0,2)];
+        const volRu = volEn === "Low" ? "Низкий" : (volEn === "High" ? "Высокий" : "Средний");
+
+        const market = /OTC/i.test(pair) ? "OTC" : "—";
+
+        let valid = "—";
         try{
             const secs = state.expirySeconds;
             if (secs) {
                 const d = new Date(Date.now() + secs*1000);
-                valid = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                valid = d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
             }
         }catch(_){}
 
-        const dirEl = q('sigDirection');
-        dirEl.textContent = dir;
-        dirEl.classList.toggle('up', dir === 'UP');
-        dirEl.classList.toggle('down', dir === 'DOWN');
+        // направление + иконка
+        const dirEl = document.getElementById("sigDirection");
+        const isBuy = dir === "UP";
+        if (dirEl) {
+            dirEl.textContent = isBuy ? "ПОКУПКА" : "ПРОДАЖА";
+            dirEl.classList.toggle("buy",  isBuy);
+            dirEl.classList.toggle("sell", !isBuy);
+        }
+        const iconBox = document.getElementById("sigDirIcon");
+        if (iconBox) iconBox.innerHTML = isBuy ? BUY_SVG : SELL_SVG;
 
-        q('sigMarket').textContent   = market || '—';
-        q('sigConf').textContent     = conf + '%';
-        q('sigTime').textContent     = time;
-        q('sigStrength').textContent = strength;
-        q('sigPair').textContent     = pair;
-        q('sigValid').textContent    = valid;
-        q('sigAcc').textContent      = acc + '%';
-        q('sigVol').textContent      = vol;
+        // значения
+        document.getElementById("sigMarket").textContent   = market;
+        document.getElementById("sigConf").textContent     = conf + "%";
+        document.getElementById("sigTime").textContent     = time;
+        document.getElementById("sigStrength").textContent = strengthRu;
+        document.getElementById("sigPair").textContent     = pair;
+        document.getElementById("sigValid").textContent    = valid;
+        document.getElementById("sigAcc").textContent      = acc + "%";
+        document.getElementById("sigVol").textContent      = volRu;
 
-        viewA.style.display = 'none';
-        viewR.hidden = false;
+        // показать экран результата
+        document.getElementById("sigAnalysis").style.display = "none";
+        document.getElementById("sigResult").hidden = false;
+
+        // сохранить результат для восстановления
+        saveResult({
+            isBuy,
+            pair,
+            conf: conf + "%",
+            acc:  acc  + "%",
+            market,
+            strRu: strengthRu,
+            volRu,
+            time,
+            valid
+        });
     }
 
     function resetAll(){
-        document.body.classList.remove('analysis-open');
-        // убираем смещение
-        document.body.style.removeProperty('--raise');
+        document.body.classList.remove("analysis-open");
+        document.body.style.removeProperty("--raise");
 
-        viewA.style.display = '';
-        viewR.hidden = true;
-        bar.style.width = '0%';
-        [...list.querySelectorAll('.sig-step')].forEach(li => li.classList.remove('running','done'));
+        if (viewA) viewA.style.display = "";
+        if (viewR) viewR.hidden = true;
 
-        const clear = id => { const el = q(id); if (el) el.value=''; };
-        clear('pairField'); clear('timeField'); clear('modelField');
+        resetSigSteps();
+
+        const clear = id => { const el = q(id); if (el) el.value=""; };
+        clear("pairField"); clear("timeField"); clear("modelField");
 
         state.pair = null;
         state.time = null;
@@ -695,8 +883,40 @@ setCurrentLang("ru");
         state.expirySeconds = null;
         state.model = null;
 
-        if (typeof window.checkReady === 'function') checkReady();
+        try { localStorage.removeItem(STATE_KEY); } catch(_) {}
+        try { localStorage.removeItem(RESULT_KEY); } catch(_) {}
+
+        const iconBox = document.getElementById("sigDirIcon");
+        if (iconBox) iconBox.innerHTML = "";
+
+        checkReady();
     }
 
     function rand(a,b){ return Math.floor(a + Math.random()*(b-a+1)); }
 })();
+
+// ===============================================
+// Шаги анализа — классы и прогресс
+// ===============================================
+const _sigSteps = Array.from(document.querySelectorAll("#sigSteps .sig-step"));
+const _sigBar   = document.getElementById("sigProgress");
+
+function setSigStepsState(currentIndex){
+    _sigSteps.forEach((el, i)=>{
+        el.classList.remove("is-done","is-active","is-next");
+        if(i < currentIndex){ el.classList.add("is-done"); }
+        else if(i === currentIndex){ el.classList.add("is-active"); }
+        else { el.classList.add("is-next"); }
+    });
+    if(_sigBar){
+        const ratio = Math.min(1, currentIndex / _sigSteps.length);
+        const jitter = Math.random()*1.2;
+        _sigBar.style.width = Math.min(100, ratio*100 + jitter) + "%";
+    }
+}
+
+function resetSigSteps(){
+    _sigSteps.forEach(el=>el.classList.remove("is-done","is-active","is-next"));
+    if(_sigSteps.length){ _sigSteps[0].classList.add("is-active"); }
+    if(_sigBar){ _sigBar.style.width = "0%"; }
+}

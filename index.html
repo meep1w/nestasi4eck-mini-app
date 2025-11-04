@@ -18,7 +18,7 @@
                 <span class="vip-indicator" id="vipIndicator"></span>
             </button>
 
-            <!-- Языковое меню ПОД VIP -->
+            <!-- Языковое меню -->
             <div class="lang-dropdown" id="langDropdown">
                 <button class="lang-btn" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
                     <img class="lang-flag" id="langFlag" src="images/flags/ru.svg" alt="RU" />
@@ -39,7 +39,7 @@
             <p>Умные сигналы для прибыльной торговли</p>
         </div>
 
-        <!-- Блок параметров -->
+        <!-- Карточка параметров -->
         <div class="glass-card">
             <div class="field-block" onclick="selectField('pair')">
                 <label>Валютная пара</label>
@@ -59,7 +59,7 @@
             <button class="submit-btn" id="getSignalBtn" disabled>Получить сигнал</button>
         </div>
 
-        <!-- Блок сигнала -->
+        <!-- Карточка сигнала -->
         <div class="glass-signal">
             <div class="signal-top">
                 <div class="signal-title">
@@ -72,7 +72,7 @@
             </div>
 
             <div class="signal-bottom">
-                <!-- Твоя анимированная иконка (по умолчанию видна; при анализе скрывается CSS-ом) -->
+                <!-- Анимированная иконка (видна по умолчанию) -->
                 <svg class="wave-loader" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2">
                         <animate attributeName="stroke-dasharray" values="120;20;120" dur="1.5s" repeatCount="indefinite" />
@@ -83,34 +83,114 @@
                 <!-- Экран анализа -->
                 <div id="sigAnalysis" class="sig-analysis">
                     <ul class="sig-steps" id="sigSteps">
-                        <li class="sig-step"><span class="dot"></span><div><b>Technical analysis</b><div class="sub">Indicators &amp; S/R</div></div></li>
-                        <li class="sig-step"><span class="dot"></span><div><b>Pattern recognition</b><div class="sub">Trends &amp; figures</div></div></li>
-                        <li class="sig-step"><span class="dot"></span><div><b>Mathematical calculations</b><div class="sub">Probabilities &amp; risks</div></div></li>
-                        <li class="sig-step"><span class="dot"></span><div><b>Signal generation</b><div class="sub">Final assembling</div></div></li>
-                        <li class="sig-step"><span class="dot"></span><div><b>Validation</b><div class="sub">Consistency check</div></div></li>
+                        <li class="sig-step">
+              <span class="icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24 "><title>Text-link-analysis SVG Icon</title><path fill="#ffffff" d="M8 10h8v2H8zm0-4h12v2H8zm0-4h12v2H8z"/><path fill="#ffffff" d="m4.711 28l5.631-9.996l7.434 6.49a2 2 0 0 0 3.084-.534l6.97-10.403l-1.661-1.114l-7 10.448l-.07.103l-7.435-6.49a2.003 2.003 0 0 0-3.08.53L4 25.183V2H2v26a2.002 2.002 0 0 0 2 2h26v-2Z"/></svg>
+              </span>
+                            <div><b>Технический скрининг</b><div class="sub">Индикаторы, уровни, волатильность</div></div>
+                            <span class="check" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+                        </li>
+
+                        <li class="sig-step">
+              <span class="icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>Pattern SVG Icon</title><path fill="#ffffff" d="M6 19.23q-.508 0-.87-.36q-.36-.362-.36-.87t.36-.87t.87-.36q.125 0 .221.018t.202.07l4.435-4.435q-.125-.333-.055-.682t.33-.608t.608-.33t.682.055l4.435-4.435l-.06-.202Q16.77 6.125 16.77 6q0-.508.362-.87q.361-.36.869-.36t.87.36t.36.87t-.36.87q-.362.36-.87.36q-.308 0-.423-.088l-4.435 4.43q.125.332.055.684t-.324.606q-.271.27-.62.34t-.682-.06l-4.325 4.32l.039.038h3.592q.16-.335.456-.533t.661-.198q.383 0 .692.195t.449.536h3.73q.16-.34.459-.536q.3-.195.676-.195q.508 0 .87.362q.36.361.36.869t-.36.87t-.87.36q-.377 0-.676-.197q-.299-.198-.459-.533h-3.73q-.14.34-.453.536q-.311.195-.682.195t-.667-.198t-.456-.533H7.123q-.14.335-.45.533T6 19.23m0-6q-.508 0-.87-.362q-.36-.361-.36-.869t.36-.87t.87-.36t.87.36q.36.362.36.87t-.36.87t-.87.36m0-6q-.508 0-.87-.36q-.36-.362-.36-.87t.36-.87t.87-.36t.87.36q.36.362.36.87t-.36.87t-.87.36m6 0q-.508 0-.87-.36q-.36-.362-.36-.87t.36-.87t.87-.36t.87.36q.36.362.36.87t-.36.87t-.87.36m6 6q-.508 0-.87-.36q-.36-.362-.36-.87t.36-.87t.87-.36t.87.36q.36.362.36.87t-.36.87t-.87.36"/></svg>
+              </span>
+                            <div><b>Распознавание паттернов</b><div class="sub">Тренды, фигуры, свечные модели</div></div>
+                            <span class="check" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+                        </li>
+
+                        <li class="sig-step">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 7h8M8 3v8M14 14l6 6M20 14l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+                            <div><b>Математическое моделирование</b><div class="sub">Вероятности и риск-менеджмент</div></div>
+                            <span class="check" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+                        </li>
+
+                        <li class="sig-step">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M3 12h6l3-5 3 10 3-5h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+                            <div><b>Генерация сигнала</b><div class="sub">Сборка и нормализация факторов</div></div>
+                            <span class="check" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+                        </li>
+
+                        <li class="sig-step">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2.5 7-7-4-7 4 2.5-7L2 9h7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+                            <div><b>Кросс-валидация</b><div class="sub">Согласованность и контроль ошибок</div></div>
+                            <span class="check" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+                        </li>
                     </ul>
-                    <div class="sig-progress"><div class="bar" id="sigProgress" style="width:0%"></div></div>
-                </div>
 
-                <!-- Экран результата -->
-                <div id="sigResult" class="sig-result" hidden>
-                    <div class="dir" id="sigDirection">UP</div>
-                    <div class="sig-grid">
-                        <div class="kv"><div class="k">MARKET:</div><div class="v" id="sigMarket">—</div></div>
-                        <div class="kv"><div class="k">CONFIDENCE:</div><div class="v" id="sigConf">—</div></div>
-                        <div class="kv"><div class="k">TIME:</div><div class="v" id="sigTime">—</div></div>
-                        <div class="kv"><div class="k">STRENGTH:</div><div class="v" id="sigStrength">—</div></div>
-                        <div class="kv"><div class="k">PAIR:</div><div class="v" id="sigPair">—</div></div>
-                        <div class="kv"><div class="k">VALID UNTIL:</div><div class="v" id="sigValid">—</div></div>
-                        <div class="kv"><div class="k"><span class="pct" id="sigAcc">—</span></div><div class="v">ACCURACY</div></div>
-                        <div class="kv"><div class="k" id="sigVol">—</div><div class="v">VOLUME</div></div>
-                    </div>
-
-                    <div class="sig-actions">
-                        <button class="btn-primary" id="sigRepeat">Repeat</button>
-                        <button class="btn-ghost"   id="sigReset">Reset</button>
+                    <div class="sig-progress">
+                        <div class="bar" id="sigProgress" style="width:0%"></div>
                     </div>
                 </div>
+
+                <div id="sigResult" class="rg2" hidden>
+
+                    <div id="sigDirIcon" class="sig-dir-icon" aria-hidden="true"></div>
+                    <!-- Лента направления -->
+                    <div class="rg2-ribbon" id="sigDirection">ПОКУПКА</div>
+
+                    <!-- Пара по центру -->
+                    <div class="rg2-pair" id="sigPair">—</div>
+
+                    <!-- Два крупных счётчика -->
+                    <div class="rg2-counters">
+                        <div class="rg2-counter">
+                            <div class="k">УВЕРЕННОСТЬ</div>
+                            <div class="v" id="sigConf">—</div>
+                        </div>
+                        <div class="rg2-counter">
+                            <div class="k">ТОЧНОСТЬ</div>
+                            <div class="v" id="sigAcc">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Табличные строки (левая метка, правое значение) -->
+                    <div class="rg2-list">
+                        <div class="row">
+                            <div class="k">РЫНОК</div>
+                            <div class="v" id="sigMarket">—</div>
+                        </div>
+                        <div class="row">
+                            <div class="k">СИЛА</div>
+                            <div class="v" id="sigStrength">—</div>
+                        </div>
+                        <div class="row">
+                            <div class="k">ОБЪЁМ</div>
+                            <div class="v" id="sigVol">—</div>
+                        </div>
+                        <div class="row">
+                            <div class="k">ВРЕМЯ</div>
+                            <div class="v" id="sigTime">—</div>
+                        </div>
+                        <div class="row">
+                            <div class="k">ДЕЙСТВИТЕЛЕН ДО</div>
+                            <div class="v" id="sigValid">—</div>
+                        </div>
+                    </div>
+
+                    <div class="rg2-actions">
+                        <button class="rg2-btn" id="sigRepeat">Повторить</button>
+                        <button class="rg2-btn ghost" id="sigReset">Сбросить</button>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </main>
@@ -131,11 +211,11 @@
 
             <div class="faq-item">
                 <button class="faq-question" onclick="toggleFAQ(this)">
-                    <span>Как выбрать правильную модель?</span>
+                    <span>Зачем нужен VIP статус?</span>
                     <img src="images/ArrowDownAlt2.svg" class="arrow-icon" alt="Стрелка" />
                 </button>
                 <div class="faq-answer">
-                    Выбирайте модель в зависимости от уровня доступа и предпочтений: стандартные или платиновые.
+                    VIP Статус открывает вам двери в повышенную доходность. С VIP анализ рынка проходит куда быстрее и от этого качество сигнала растет.
                 </div>
             </div>
 
@@ -149,6 +229,27 @@
                 </div>
             </div>
 
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Чем отличаются торговые модели?</span>
+                    <img src="images/ArrowDownAlt2.svg" class="arrow-icon" alt="Стрелка" />
+                </button>
+                <div class="faq-answer">
+                    Торговые модели отличаются производительностью и вычислительной мощностью тем самым две модели могут по разному показывать сигналы.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFAQ(this)">
+                    <span>Верные ли сигналы выдает бот?</span>
+                    <img src="images/ArrowDownAlt2.svg" class="arrow-icon" alt="Стрелка" />
+                </button>
+                <div class="faq-answer">
+                    Да, наш бот выдает сигнал на основе сразу 29 разных бирж и бинарных опционов. Сигнал выдается точный полагаясь на все факторы.
+                </div>
+            </div>
+
+
         </div>
     </section>
 </div>
@@ -158,7 +259,7 @@
     <div class="cp" role="document">
         <div class="cp-header">
             <div class="cp-tabs" id="cpTabs">
-                <button class="cp-tab" data-tab="fiat" aria-selected="true"  title="Валюты">
+                <button class="cp-tab" data-tab="fiat" aria-selected="true" title="Валюты">
                     <img src="images/icons/Dollar.svg" alt="$" />
                 </button>
                 <button class="cp-tab" data-tab="crypto" aria-selected="false" title="Криптовалюта">
@@ -217,6 +318,105 @@
     </div>
 </div>
 <!-- /POPUP -->
+
+<!-- POPUP: VIP Bottom Sheet -->
+<div class="vip-overlay" id="vipSheet" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="vip-backdrop" data-close></div>
+
+    <section class="vip-sheet" role="document" aria-labelledby="vipTitle">
+        <div class="vip-grabber" data-close="drag" aria-hidden="true"></div>
+
+        <header class="vip-head">
+            <div class="vip-title-wrap">
+                <h3 id="vipTitle">Получи доступ к VIP</h3>
+            </div>
+            <button class="vip-close" id="vipClose" aria-label="Закрыть">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#9aa7b8" d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3 10.6 10.6 16.9 4.3z"/></svg>
+            </button>
+        </header>
+
+        <div class="vip-body">
+            <!-- Hero -->
+            <div class="vip-hero">
+                <div class="vip-badge">Эксклюзивный доступ</div>
+                <h4>Больше точности. Больше рынков. Меньше рисков. Меньше сливов</h4>
+                <p class="vip-sub">VIP открывает продвинутую модель, приоритетные сигналы и инструменты контроля риска.</p>
+            </div>
+
+            <!-- Короткое сравнение -->
+            <div class="vip-compare">
+                <div class="vip-card free">
+                    <div class="vip-card-title">Базовый</div>
+                    <ul>
+                        <li>Модель NeuralEdge V1</li>
+                        <li>Средняя точность сигналов</li>
+                        <li>Стандартные рынки</li>
+                        <li>Ограниченная история сигналов</li>
+                        <li>Анализ рынка каждые 40 секунд</li>
+                        <li>Доходность до 80%</li>
+                    </ul>
+                </div>
+
+                <div class="vip-card vip">
+                    <div class="vip-card-title">VIP</div>
+                    <ul>
+                        <li>Модель NeuralEdge V2</li>
+                        <li>Таймфреймы до <b>H4</b></li>
+                        <li>Расширенные рынки: акции/крипто/индексы</li>
+                        <li>Приоритетные сигналы и ранний доступ</li>
+                        <li>Детализация: сила/объём/вероятностные коридоры</li>
+                        <li>Глубокая история и избранное</li>
+                        <li>Анализ рынка каждые 1.2 секунды</li>
+                        <li>Доходность до 170%</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="vip-h3">Что даёт VIP</h3>
+            <!-- Фичи-лента -->
+            <div class="vip-features">
+                <div class="vip-feature">
+                    <img class="vip-icon" src="images/vip/Chart_perspective_matte_s%201.svg" alt="Chart">
+                    <div class="vf-text">
+                        <div class="vf-title">+ до 12% ↑ точность</div>
+                        <div class="vf-sub">за счёт ансамблей и калибровки вероятностей.</div>
+                    </div>
+                </div>
+
+                <div class="vip-feature">
+                    <img class="vip-icon" src="images/vip/Flash_perspective_matte_s.svg" alt="Flash">
+                    <div class="vf-text">
+                        <div class="vf-title">Приоритетная выдача</div>
+                        <div class="vf-sub">сигнал попадает к VIP первым.</div>
+                    </div>
+                </div>
+
+                <div class="vip-feature">
+                    <img class="vip-icon" src="images/vip/Briefcase_perspective_matte_s%201.svg" alt="Briefcase">
+                    <div class="vf-text">
+                        <div class="vf-title">Риск-гайды</div>
+                        <div class="vf-sub">адаптивный лот/время экспирации под волатильность.</div>
+                    </div>
+                </div>
+
+                <div class="vip-feature">
+                    <img class="vip-icon" src="images/vip/Diagram_perspective_matte_s%201.svg" alt="Diagram">
+                    <div class="vf-text">
+                        <div class="vf-title">Расширенные рынки</div>
+                        <div class="vf-sub">пакеты по акциям, индексам и крипте.</div>
+                    </div>
+                </div>
+            </div>
+            <section class="vip-how">
+                <h4>Как получить VIP</h4>
+                <p class="vip-how-text">
+                    Продолжайте торговать на PocketOption. И вам в скорем времени автоматически выдастся VIP статус. Все зависит от вашего оботора на сайте брокера.
+                </p>
+            </section>
+    </section>
+</div>
+
+
 
 <script src="scripts/main.js"></script>
 </body>
