@@ -212,11 +212,11 @@ const I18N = {
     // ===== EN (default) =====
     en: {
         app_title: "Pocket Signals",
-        header_become_vip: "Become VIP",
+
         lang_select_aria: "Select language",
         hero_title: "Trade with AI",
         hero_sub: "Smart signals for profitable trading",
-
+        header_become_vip: "Become VIP",
         field_pair_label: "Currency pair",
         field_pair_ph: "Choose pair",
         field_expiry_label: "Expiry time",
@@ -1041,7 +1041,9 @@ function applyI18nToDOM() {
     try { document.title = t("app_title") || document.title; } catch(_){}
 
     // Header
-    document.querySelector("#vipBtn span:nth-of-type(2)")?.replaceChildren(t("header_become_vip"));
+    const vipText = document.getElementById("vipText");
+    if (vipText) vipText.textContent = t("header_become_vip");
+
     document.querySelector("#langMenu")?.setAttribute("aria-label", t("lang_select_aria"));
 
     // Hero
